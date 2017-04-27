@@ -58,10 +58,26 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     this
   }
 
-  override def setName(_name: String): this.type = {
-    partitionsRDD.setName(_name)
+  override def getStorageLevel: StorageLevel = partitionsRDD.getStorageLevel
+
+  override def localCheckpoint(): this.type = {
+    partitionsRDD.localCheckpoint()
     this
   }
+
+  override def checkpoint(): Unit = {
+    partitionsRDD.checkpoint()
+  }
+
+  override def isCheckpointed: Boolean = partitionsRDD.isCheckpointed
+
+  override def setName(_name: String): this.type = {
+    partitionsRDD.setName(_name)
+    name = _name
+    this
+  }
+
+  def getPartitionsRDD: RDD[IndexedRDDPartition[K, V]] = partitionsRDD
 
   override def count(): Long = {
     partitionsRDD.map(_.size).reduce(_ + _)

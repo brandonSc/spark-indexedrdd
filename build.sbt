@@ -1,6 +1,6 @@
 name := "spark-indexedrdd"
-version := "0.4.0"
-organization := "edu.berkeley.cs.amplab"
+version := "0.4.1"
+organization := "cenx"
 
 scalaVersion := "2.11.8"
 crossScalaVersions := Seq("2.10.6", "2.11.6")

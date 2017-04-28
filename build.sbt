@@ -2,11 +2,11 @@ name := "spark-indexedrdd"
 organization := "cenx"
 
 publishTo := {
-  val nexus = "http://nexus.cenx.localnet:8081/nexus/content/repositories/"
+  val nexus = "https://ship.cenx.com/repository/"
   if (isSnapshot.value)
-    Some("snapshots" at nexus + "snapshots")
+    Some("snapshots" at nexus + "maven-snapshots")
   else
-    Some("releases"  at nexus + "releases")
+    Some("releases"  at nexus + "maven-releases")
 }
 
 scalaVersion := "2.11.8"

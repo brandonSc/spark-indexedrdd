@@ -1,6 +1,14 @@
 name := "spark-indexedrdd"
 organization := "cenx"
 
+publishTo := {
+  val nexus = "https://ship.cenx.com/repository/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "maven-snapshots")
+  else
+    Some("releases"  at nexus + "maven-releases")
+}
+
 scalaVersion := "2.11.8"
 crossScalaVersions := Seq("2.10.6", "2.11.6")
 
@@ -16,7 +24,7 @@ libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
 )
 
-publishMavenStyle := true
+//publishMavenStyle := true
 
 licenses += "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")
 

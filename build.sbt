@@ -1,5 +1,4 @@
 name := "spark-indexedrdd"
-version := "0.4.1"
 organization := "cenx"
 
 scalaVersion := "2.11.8"

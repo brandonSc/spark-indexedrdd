@@ -2,16 +2,15 @@ name := "spark-indexedrdd"
 organization := "cenx"
 
 publishTo := {
-  val nexus = "https://ship.cenx.com/repository/"
+  val nexus = "http://nexus.cenx.localnet:8081/nexus/content/repositories/"
   if (isSnapshot.value)
-    Some("snapshots" at nexus + "maven-snapshots")
+    Some("snapshots" at nexus + "snapshots")
   else
-    Some("releases"  at nexus + "maven-releases")
+    Some("releases"  at nexus + "releases")
 }
 
 scalaVersion := "2.11.8"
 crossScalaVersions := Seq("2.10.6", "2.11.6")
-crossPaths := false
 
 spName := "amplab/spark-indexedrdd"
 sparkVersion := "2.1.0"
@@ -48,3 +47,5 @@ pomExtra :=
 javaOptions in test += "-Xmx2G"
 
 fork in test := true
+
+credentials += Credentials(Path.userHome / ".sbt" / "credentials")

@@ -11,6 +11,7 @@ publishTo := {
 
 scalaVersion := "2.11.8"
 crossScalaVersions := Seq("2.10.6", "2.11.6")
+crossPaths := false
 
 spName := "amplab/spark-indexedrdd"
 sparkVersion := "2.1.0"

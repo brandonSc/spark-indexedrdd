@@ -189,6 +189,18 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     val deletions = context.parallelize(ks.map(k => (k, ()))).partitionBy(partitioner.get)
     zipPartitionsWithOther(deletions)(new DeleteZipper)
   }
+  
+  /**
+   * Deletes any elements that have equal keys to elements in `other`. 
+   * Returns a new IndexedRDD that reflects the deletions.
+   *
+   * Some implementations may not support this operation and will throw
+   * `UnsupportedOperationException`.
+   */
+  def deleteByKey(other: RDD[(K, Unit)]): IndexedRDD[K, V] = {
+    //val deletions = other.partitionBy(partitioner.get)
+    zipPartitionsWithOther(other.partitionBy(partitioner.get))(new DeleteZipper)
+  }
 
   /** Applies a function to each partition of this IndexedRDD. */
   private def mapIndexedRDDPartitions[K2: ClassTag, V2: ClassTag](

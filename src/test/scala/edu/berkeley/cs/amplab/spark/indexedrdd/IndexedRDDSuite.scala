@@ -215,6 +215,13 @@ class UpdatableIndexedRDDSuite extends IndexedRDDSuite {
     assert(ps.delete(Array(0L)).collect.toSet === (1 to n).map(x => (x.toLong, x)).toSet)
     assert(ps.delete(Array(-1L)).collect.toSet === (0 to n).map(x => (x.toLong, x)).toSet)
   }
+
+  test("deleteByKey") {
+    val n = 10
+    val irdd = pairs(sc, n).cache()
+    var prdd = sc.parallelize((0 to 5).map(x => (x.toLong, ())), 5)
+    assert(irdd.deleteByKey(prdd).collect().toSet === (6 to n).map(x => (x.toLong, x)).toSet)
+  }
 }
 
 // Declared outside of test suite to avoid closure capture

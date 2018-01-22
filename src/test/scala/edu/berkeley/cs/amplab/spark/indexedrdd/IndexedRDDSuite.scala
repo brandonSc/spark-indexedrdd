@@ -216,11 +216,15 @@ class UpdatableIndexedRDDSuite extends IndexedRDDSuite {
     assert(ps.delete(Array(-1L)).collect.toSet === (0 to n).map(x => (x.toLong, x)).toSet)
   }
 
-  test("deleteByKey") {
-    val n = 10
+  test("deleteRDD") {
+    val n = 100
     val irdd = pairs(sc, n).cache()
-    var prdd = sc.parallelize((0 to 5).map(x => (x.toLong, ())), 5)
-    assert(irdd.deleteByKey(prdd).collect().toSet === (6 to n).map(x => (x.toLong, x)).toSet)
+    val prdd = sc.parallelize((0 to n-5).map(x => (x.toLong, x)), 5)
+    val irdd2 = create(sc.parallelize((0 to n-5).map(x => (x.toLong, x)), 10))
+    val irdd3 = irdd.createUsingIndex(prdd)
+    assert(irdd.deleteRDD(prdd).collect().toSet === (n-4 to n).map(x => (x.toLong, x)).toSet)
+    assert(irdd.deleteRDD(irdd2).collect().toSet === (n-4 to n).map(x => (x.toLong, x)).toSet)
+    assert(irdd.deleteRDD(irdd3).collect().toSet === (n-4 to n).map(x => (x.toLong, x)).toSet)
   }
 }
 

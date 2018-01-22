@@ -187,9 +187,9 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
    */
   def delete(ks: Array[K]): IndexedRDD[K, V] = {
     val deletions = context.parallelize(ks.map(k => (k, ()))).partitionBy(partitioner.get)
-    zipPartitionsWithOther(deletions)(new DeleteZipper)
+    zipPartitionsWithOther(deletions)(new OtherDeleteZipper)
   }
-  
+
   /**
    * Deletes any elements that have equal keys to elements in `other`. 
    * Returns a new IndexedRDD that reflects the deletions.
@@ -197,9 +197,11 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
    * Some implementations may not support this operation and will throw
    * `UnsupportedOperationException`.
    */
-  def deleteByKey(other: RDD[(K, Unit)]): IndexedRDD[K, V] = {
-    //val deletions = other.partitionBy(partitioner.get)
-    zipPartitionsWithOther(other.partitionBy(partitioner.get))(new DeleteZipper)
+  def deleteRDD[U: ClassTag](other: RDD[(K, U)]): IndexedRDD[K, V] = other match {
+    case other: IndexedRDD[K, U] if partitioner == other.partitioner =>
+      this.zipIndexedRDDPartitions(other)(new DeleteZipper)
+    case _ =>
+      this.zipPartitionsWithOther(other.partitionBy(partitioner.get))(new OtherDeleteZipper)
   }
 
   /** Applies a function to each partition of this IndexedRDD. */
@@ -351,8 +353,16 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     }
   }
 
-  private class DeleteZipper extends OtherZipPartitionsFunction[Unit, V] with Serializable {
-    def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[(K, Unit)])
+  private class DeleteZipper[U: ClassTag] extends ZipPartitionsFunction[U, V] with Serializable {
+    def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[IndexedRDDPartition[K, U]])
+      : Iterator[IndexedRDDPartition[K, V]] = {
+      val thisPart = thisIter.next()
+      Iterator(thisPart.delete(otherIter.map(_.iterator.map(_._1)).flatten))
+    }
+  }
+
+  private class OtherDeleteZipper[U: ClassTag] extends OtherZipPartitionsFunction[U, V] with Serializable {
+    def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[(K, U)])
       : Iterator[IndexedRDDPartition[K, V]] = {
       val thisPart = thisIter.next()
       Iterator(thisPart.delete(otherIter.map(_._1)))

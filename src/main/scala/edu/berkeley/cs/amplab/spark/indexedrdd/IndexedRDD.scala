@@ -357,7 +357,8 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[IndexedRDDPartition[K, U]])
       : Iterator[IndexedRDDPartition[K, V]] = {
       val thisPart = thisIter.next()
-      Iterator(thisPart.delete(otherIter.map(_.iterator.map(_._1)).flatten))
+      val otherPart = otherIter.next()
+      Iterator(thisPart.delete(otherPart))
     }
   }
 
@@ -365,7 +366,7 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[(K, U)])
       : Iterator[IndexedRDDPartition[K, V]] = {
       val thisPart = thisIter.next()
-      Iterator(thisPart.delete(otherIter.map(_._1)))
+      Iterator(thisPart.delete(otherIter))
     }
   }
 

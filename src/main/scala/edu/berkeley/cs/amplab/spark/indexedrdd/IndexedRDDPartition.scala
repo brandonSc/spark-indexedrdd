@@ -58,11 +58,11 @@ private[indexedrdd] abstract class IndexedRDDPartition[K, V] extends Serializabl
     throw new UnsupportedOperationException("modifications not supported")
 
   /** Deletes the specified keys. Returns a new IndexedRDDPartition that reflects the deletions. */
-  def delete[U: ClassTag](other: IndexedRDDPartition[K, U]): IndexedRDDPartition[K, V] =
+  def delete[V2: ClassTag](other: IndexedRDDPartition[K, V2]): IndexedRDDPartition[K, V] =
     throw new UnsupportedOperationException("modifications not supported")
 
   /** Deletes the specified keys. Returns a new IndexedRDDPartition that reflects the deletions. */
-  def delete[U: ClassTag](other: Iterator[(K, U)]): IndexedRDDPartition[K, V] =
+  def delete[V2: ClassTag](other: Iterator[(K, V2)]): IndexedRDDPartition[K, V] =
     throw new UnsupportedOperationException("modifications not supported")
 
   /** Maps each value, supplying the corresponding key and preserving the index. */

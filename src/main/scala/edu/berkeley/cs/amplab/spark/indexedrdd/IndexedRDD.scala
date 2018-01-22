@@ -197,8 +197,8 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
    * Some implementations may not support this operation and will throw
    * `UnsupportedOperationException`.
    */
-  def deleteRDD[U: ClassTag](other: RDD[(K, U)]): IndexedRDD[K, V] = other match {
-    case other: IndexedRDD[K, U] if partitioner == other.partitioner =>
+  def deleteRDD[V2: ClassTag](other: RDD[(K, V2)]): IndexedRDD[K, V] = other match {
+    case other: IndexedRDD[K, V2] if partitioner == other.partitioner =>
       this.zipIndexedRDDPartitions(other)(new DeleteZipper)
     case _ =>
       this.zipPartitionsWithOther(other.partitionBy(partitioner.get))(new OtherDeleteZipper)
@@ -353,8 +353,8 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     }
   }
 
-  private class DeleteZipper[U: ClassTag] extends ZipPartitionsFunction[U, V] with Serializable {
-    def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[IndexedRDDPartition[K, U]])
+  private class DeleteZipper[V2: ClassTag] extends ZipPartitionsFunction[V2, V] with Serializable {
+    def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[IndexedRDDPartition[K, V2]])
       : Iterator[IndexedRDDPartition[K, V]] = {
       val thisPart = thisIter.next()
       val otherPart = otherIter.next()
@@ -362,8 +362,8 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     }
   }
 
-  private class OtherDeleteZipper[U: ClassTag] extends OtherZipPartitionsFunction[U, V] with Serializable {
-    def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[(K, U)])
+  private class OtherDeleteZipper[V2: ClassTag] extends OtherZipPartitionsFunction[V2, V] with Serializable {
+    def apply(thisIter: Iterator[IndexedRDDPartition[K, V]], otherIter: Iterator[(K, V2)])
       : Iterator[IndexedRDDPartition[K, V]] = {
       val thisPart = thisIter.next()
       Iterator(thisPart.delete(otherIter))

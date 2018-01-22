@@ -60,8 +60,8 @@ private[indexedrdd] class PARTPartition[K, V]
     this.withMap[V](newMap)
   }
 
-  override def delete[U: ClassTag](other: IndexedRDDPartition[K, U]) :IndexedRDDPartition[K, V] = other match {
-    case other: PARTPartition[K, U] =>
+  override def delete[V2: ClassTag](other: IndexedRDDPartition[K, V2]) :IndexedRDDPartition[K, V] = other match {
+    case other: PARTPartition[K, V2] =>
       val newMap = map.snapshot()
       for (kv <- other.iterator) {
         newMap.delete(kSer.toBytes(kv._1))
@@ -71,7 +71,7 @@ private[indexedrdd] class PARTPartition[K, V]
       delete(other.iterator)
   }
 
-  override def delete[U: ClassTag](other: Iterator[(K, U)]): IndexedRDDPartition[K, V] =
+  override def delete[V2: ClassTag](other: Iterator[(K, V2)]): IndexedRDDPartition[K, V] =
     delete(PARTPartition(other))
 
   override def mapValues[V2: ClassTag](f: (K, V) => V2): IndexedRDDPartition[K, V2] = {

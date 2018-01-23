@@ -186,7 +186,7 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
    * `UnsupportedOperationException`.
    */
   def delete(ks: Array[K]): IndexedRDD[K, V] = {
-    val deletions = context.parallelize(ks.map(k => (k, ()))).partitionBy(partitioner.get)
+    val deletions = context.parallelize(ks.map(k => (k, ())))
     zipPartitionsWithOther(deletions)(new OtherDeleteZipper)
   }
 
@@ -201,7 +201,7 @@ class IndexedRDD[K: ClassTag, V: ClassTag](
     case other: IndexedRDD[K, V2] if partitioner == other.partitioner =>
       this.zipIndexedRDDPartitions(other)(new DeleteZipper)
     case _ =>
-      this.zipPartitionsWithOther(other.partitionBy(partitioner.get))(new OtherDeleteZipper)
+      this.zipPartitionsWithOther(other)(new OtherDeleteZipper)
   }
 
   /** Applies a function to each partition of this IndexedRDD. */

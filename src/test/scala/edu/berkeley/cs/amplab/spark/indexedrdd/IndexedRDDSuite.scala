@@ -220,11 +220,17 @@ class UpdatableIndexedRDDSuite extends IndexedRDDSuite {
     val n = 100
     val irdd = pairs(sc, n).cache()
     val prdd = sc.parallelize((0 to n-5).map(x => (x.toLong, x)), 5)
+    val prdd2 = sc.parallelize(Array((0L, 0), (1L, 1), (1L, 1)))
     val irdd2 = create(sc.parallelize((0 to n-5).map(x => (x.toLong, x)), 10))
     val irdd3 = irdd.createUsingIndex(prdd)
+    val irdd4 = create(sc.parallelize((0 to n).map(x => (x.toLong, x)), 10))
+    val empty = sc.parallelize(Seq.empty[(Long, Long)])
     assert(irdd.deleteRDD(prdd).collect().toSet === (n-4 to n).map(x => (x.toLong, x)).toSet)
     assert(irdd.deleteRDD(irdd2).collect().toSet === (n-4 to n).map(x => (x.toLong, x)).toSet)
     assert(irdd.deleteRDD(irdd3).collect().toSet === (n-4 to n).map(x => (x.toLong, x)).toSet)
+    assert(irdd.deleteRDD(empty).collect().toSet === irdd.collect().toSet)
+    assert(irdd.deleteRDD(irdd4).collect().toSet === Set.empty)
+    assert(irdd.deleteRDD(prdd2).collect().toSet === (2 to n).map(x => (x.toLong, x)).toSet)
   }
 }
 
